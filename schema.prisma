@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo Empresa
+model Empresa {
+  id          Int          @id @default(autoincrement())
+  nome        String
+  responsavel Responsavel? @relation(fields: [responsavelId], references: [id], onDelete: Cascade)
+  responsavelId Int?       @unique // Chave estrangeira para relação 1:1 com Responsável
+  produtos    Produto[]   // Relação 1:N com Produto
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+// Modelo Responsável
+model Responsavel {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  telefone    String
+  email       String   @unique
+  cpf         String   @unique
+  empresa     Empresa? @relation // Relação 1:1 com Empresa
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Modelo Produto
+model Produto {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  descricao   String?
+  preco       Float
+  empresaId   Int      // Chave estrangeira para Empresa
+  empresa     Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
